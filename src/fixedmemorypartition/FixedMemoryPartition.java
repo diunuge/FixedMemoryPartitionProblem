@@ -7,7 +7,9 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,52 +41,24 @@ public class FixedMemoryPartition {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        
         FixedMemoryPartition myFMP = new FixedMemoryPartition("in2.txt");
-        //myFMP.readInput();
-        //myFMP.showInput();
+        
         myFMP.run();
-        
-        //System.out.println(myFMP.getCombination(6));
-        //int[] data = {0,1,0,1};
-        //int combinationIndex = myFMP.getCombinationIndex(data);
-        //System.out.println(myFMP.getCombinationTurnaroundTime(combinationIndex));
-        
-        //Integer[] data1 = {1,1,1,0};
-        //System.out.println(myFMP.isValidCombination(data1));
-        
-        /*ArrayList<ProgramData> test = new ArrayList();
-        test.add(new ProgramData(0,0,4));
-        test.add(new ProgramData(1,1,3));
-        test.add(new ProgramData(2,0,10));
-        test.add(new ProgramData(3,1,7));
-        Collections.sort(test, new Comparator() {
-
-            @Override
-            public int compare(Object o1, Object o2) {
-                ProgramData a = (ProgramData)o1;
-                ProgramData b = (ProgramData)o2;
-                return a.completionTime - b.completionTime;
-            }
-
-        });
-        System.out.print(test);*/
     }
     
     public void run(){
         readInput();
-        showInput();
+        //showInput();
         calcTurnAroundTime();
         int optimalCombinationIndex = getOptimalCombinationIndex();
         showAllocation(optimalCombinationIndex);
     }
     
-    public void readInput(){
+    private void readInput(){
         BufferedReader br=null;
         try {
             br = new BufferedReader(new FileReader(inFile));
-            
-            //StringBuilder sb = new StringBuilder();
             
             String line = br.readLine();
             String buf[] = line.split(" ");
@@ -93,8 +67,6 @@ public class FixedMemoryPartition {
             
             noOfCombinations = power(noOfMemoryPartitions, noOfPrograms);
             CombTurnaroundTime = new Integer[noOfCombinations];
-            
-            //System.out.println(noOfMemoryPartitions+" "+noOfPrograms);
             
             line = br.readLine();
             buf = line.split(" ");
@@ -164,7 +136,7 @@ public class FixedMemoryPartition {
         }       
     }
     
-    public void calcTurnAroundTime(){
+    private void calcTurnAroundTime(){
         for(int combinationIndex=0; combinationIndex<noOfCombinations; combinationIndex++){
             if(isValidCombination(getCombination(combinationIndex))){
                 CombTurnaroundTime[combinationIndex] = getCombinationTurnaroundTime(combinationIndex);
@@ -175,7 +147,7 @@ public class FixedMemoryPartition {
         }
     }
     
-    public int getOptimalCombinationIndex(){
+    private int getOptimalCombinationIndex(){
         int optimalCombinationIndex=0;
         
         int minTurnaroundTime = 1000000;
@@ -200,7 +172,7 @@ public class FixedMemoryPartition {
         return optimalCombinationIndex;
     }
     
-    public void showAllocation(int combinationIndex){
+    private void showAllocation(int combinationIndex){
         Integer[] combination = getCombination(combinationIndex);
         
         int totalTurnaroundTime = 0;
@@ -230,7 +202,7 @@ public class FixedMemoryPartition {
             ProgramData program = allocation.get(programIndex);
             int partition = program.allocatedPartition;
             int completionTime = program.completionTime;
-            System.out.println("Program "+program.programIndex+" runs in region "+partition+
+            System.out.println("Program "+(program.programIndex+1)+" runs in region "+(partition+1)+
                     " from "+timeSpent[partition]+" to "+(timeSpent[partition]+completionTime));
             
             timeSpent[partition]+=completionTime;     
@@ -239,7 +211,7 @@ public class FixedMemoryPartition {
         System.out.println("Average turnaround time = "+totalTurnaroundTime/(float)noOfPrograms);
     }
     
-    public boolean isValidCombination(Integer[] combination){
+    private boolean isValidCombination(Integer[] combination){
         
         for(int programIndex=0; programIndex<noOfPrograms; programIndex++){
             int assignedPartition = combination[programIndex];
@@ -249,7 +221,7 @@ public class FixedMemoryPartition {
         return true;
     }
     
-    public int getCombinationTurnaroundTime(int combinationIndex){
+    private int getCombinationTurnaroundTime(int combinationIndex){
         
         int turnaroundTime=0;        
         Integer[] combination = getCombination(combinationIndex);
@@ -284,13 +256,13 @@ public class FixedMemoryPartition {
         }
     }
     
-    public void showInput(){
+    private void showInput(){
         System.out.println("# of Memory Partitions\t:"+noOfMemoryPartitions+"\n# of Programs\t\t:"+noOfPrograms+"\n");
         
         showCompletionTimeMat();
     }
     
-    public Integer[] getCombination(int combinationIndex){
+    private Integer[] getCombination(int combinationIndex){
         Integer[] combination = new Integer[noOfPrograms];
         
         int number = combinationIndex;
@@ -301,7 +273,7 @@ public class FixedMemoryPartition {
         return combination;
     }
     
-    public int getCombinationIndex(int[] combination){
+    private int getCombinationIndex(int[] combination){
         int combinationIndex = 0;
         for(int programIndex=0; programIndex<noOfPrograms; programIndex++){
             combinationIndex+=power(noOfMemoryPartitions, (noOfPrograms-programIndex-1))*combination[programIndex];
